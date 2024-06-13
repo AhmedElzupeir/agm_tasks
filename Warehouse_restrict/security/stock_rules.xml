@@ -5,7 +5,7 @@
         <record id="warehouse_rules_member" model="ir.rule">
             <field name="name">Warehouse rule</field>
             <field name="model_id" ref="stock.model_stock_warehouse"/>
-            <field name="domain_force">['|',('id', 'in', user.warehose_ids.ids),('id' , '=' , False)]</field>
+            <field name="domain_force">[('id', 'in', [warehouse.id for warehouse in user.warehouse_ids])]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
         </record>
 
@@ -13,7 +13,10 @@
         <record id="location_rules_members" model="ir.rule">
             <field name="name">location rule</field>
             <field name="model_id" ref="stock.model_stock_location"/>
-            <field name="domain_force">['|',('warehouse_id' , 'in' , user.warehose_ids.ids),('warehouse_id' , '=' , False)]</field>
+            <field name="domain_force">['|',
+            ('id' , 'child_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids]),
+            ('id' , 'parent_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids])
+            ]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
         </record>
 
@@ -21,7 +24,10 @@
         <record id="quant_rules_members" model="ir.rule">
             <field name="name">quant rule</field>
             <field name="model_id" ref="stock.model_stock_quant"/>
-            <field name="domain_force">['|',('warehouse_id' , 'in' , user.warehose_ids.ids),('warehouse_id' , '=' , False)]</field>
+            <field name="domain_force">['|',
+                ('location_id.id' , 'child_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids]),
+                ('location_id.id' , 'parent_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids])
+                ]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
         </record>
 
@@ -29,14 +35,19 @@
         <record id="picking_type_rules_members" model="ir.rule">
             <field name="name">picking type rule</field>
             <field name="model_id" ref="stock.model_stock_picking_type"/>
-            <field name="domain_force">['|',('warehouse_id' , 'in' , user.warehose_ids.ids),('warehouse_id' , '=' , False)]</field>
+            <field name="domain_force">[
+                ('warehouse_id.id' , 'in' , [warehouse.id for warehouse in user.warehouse_ids])
+                ]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
         </record>
 
         <record id="picking_rules_members" model="ir.rule">
             <field name="name">picking rule</field>
             <field name="model_id" ref="stock.model_stock_picking"/>            
-            <field name="domain_force">['|',('location_id.warehouse_id' , 'in' , user.warehose_ids.ids),('location_id.warehouse_id' , '=' , False)]</field>
+            <field name="domain_force">['|',
+                ('location_id.id' , 'child_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids]),
+                ('location_id.id' , 'parent_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids])
+                ]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
         </record>
     
@@ -44,22 +55,21 @@
         <record id="scrap_rules_members" model="ir.rule">
             <field name="name">scrap rule</field>
             <field name="model_id" ref="stock.model_stock_scrap"/>
-            <field name="domain_force">['|',('location_id.warehouse_id' , 'in' , user.warehose_ids.ids),('location_id.warehouse_id' , '=' , False)]</field>
+            <field name="domain_force">['|',
+                ('location_id.id' , 'child_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids]),
+                ('location_id.id' , 'parent_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids])
+                ]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
         </record>
     
-        <record id="stock_product_rules_members" model="ir.rule">
-            <field name="name">stock product rule</field>
-            <field name="model_id" ref="stock.model_product_product"/>
-            <field name="domain_force">['|',('warehouse_id' , 'in' , user.warehose_ids.ids),('warehouse_id' , '=' , False)]</field>
-            <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
-        </record>
-
 
         <record id="stock_move_line_rules_members" model="ir.rule">
             <field name="name">move line rule</field>
             <field name="model_id" ref="stock.model_stock_move_line"/>
-            <field name="domain_force">['|',('location_id.warehouse_id.id' , 'in' , user.warehose_ids.ids),('location_id.warehouse_id.id' , '=' , False)]</field>
+            <field name="domain_force">['|',
+                ('location_id.id' , 'child_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids]),
+                ('location_id.id' , 'parent_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids])
+                ]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
         </record>
 
@@ -67,17 +77,23 @@
         <record id="stock_move_rules_members" model="ir.rule">
             <field name="name">stock move rule</field>
             <field name="model_id" ref="stock.model_stock_move"/>
-            <field name="domain_force">['|',('location_id.warehouse_id.id' , 'in' , user.warehose_ids.ids),('location_id.warehouse_id.id' , '=' , False)]</field>
+            <field name="domain_force">['|',
+                ('location_id.id' , 'child_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids]),
+                ('location_id.id' , 'parent_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids])
+                ]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
         </record>
-    
 
+    
         <record id="orderpoint_rules_members" model="ir.rule">
             <field name="name">orderpoint rule</field>
             <field name="model_id" ref="stock.model_stock_warehouse_orderpoint"/>
-            <field name="domain_force">['|',('location_id.warehouse_id.id' , 'in' , user.warehose_ids.ids),('location_id.warehouse_id.id' , '=' , False)]</field>
+            <field name="domain_force">['|',
+            ('location_id.id' , 'child_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids]),
+            ('location_id.id' , 'parent_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids])
+            ]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
-        </record>
-    
+        </record> 
+
     </data>
 </odoo>
