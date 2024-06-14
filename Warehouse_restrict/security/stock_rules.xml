@@ -45,8 +45,8 @@
             <field name="name">picking rule</field>
             <field name="model_id" ref="stock.model_stock_picking"/>            
             <field name="domain_force">['|',
-                ('location_id.id' , 'child_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids]),
-                ('location_id.id' , 'parent_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids])
+                ('location_dest_id.id' , 'child_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids]),
+                ('location_dest_id.id' , 'parent_of' , [warehouse.view_location_id.id for warehouse in user.warehouse_ids])
                 ]</field>
             <field name="groups" eval="[(4, ref('stock.group_stock_user')), (4, ref('stock.group_stock_manager'))]"  />
         </record>
